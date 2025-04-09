@@ -1,10 +1,18 @@
 models:
-  - name: fct_orders
+  - name: fct_order_items
     config:
       contract:
         enforced: true
     columns:
+      - name: order_item_id
+        data_type: varchar
+        constraints:
+          - type: not_null
       - name: order_id
+        data_type: varchar
+        constraints:
+          - type: not_null
+      - name: product_id
         data_type: varchar
         constraints:
           - type: not_null
@@ -30,9 +38,3 @@ models:
         data_type: number
       - name: location_opened_at
         data_type: timestamp_ntz
-      - name: ordered_month
-        data_type: number
-      - name: ordered_day
-        data_type: number
-      - name: ordered_year
-        data_type: number
