@@ -37,7 +37,7 @@ project_dir = ./
 allow_implicit_indents = True
 
 # [sqlfluff:rules:aliasing.length]
-# min_alias_length = 3
+min_alias_length = 1
 
 # The default configuration for capitalisation rules is "consistent"
 # which will auto-detect the setting from the rest of the file. This
@@ -66,3 +66,7 @@ extended_capitalisation_policy = lower
 [sqlfluff:rules:convention.not_equal]
 # Default to preferring the "c_style" (i.e. `!=`)
 preferred_not_equal_style = c_style
+
+
+[sqlfluff:rules:ambiguous.column_references]  # Number in group by
+group_by_and_order_by_style = explicit
