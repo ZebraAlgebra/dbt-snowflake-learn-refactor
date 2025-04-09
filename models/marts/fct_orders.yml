@@ -1,5 +1,6 @@
 models:
   - name: fct_orders
+    latest_version: 2
     config:
       contract:
         enforced: true
@@ -36,3 +37,16 @@ models:
         data_type: number
       - name: ordered_year
         data_type: number
+    versions:
+      - v: 1
+        defined_in: fct_orders
+        config:
+          alias: fct_orders
+      - v: 2
+        columns:
+          - include: all
+            exclude: [order_total, location_opened_at]
+          - name: order_amount
+            data_type: number
+          - name: location_opened_at
+            data_type: date

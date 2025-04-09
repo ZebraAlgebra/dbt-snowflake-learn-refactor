@@ -1,1 +1,1 @@
-{{ find_datatypes(ref('dim_product_supplies')) }}
+{{ find_datatypes(ref('fct_orders', version=2)) }}
