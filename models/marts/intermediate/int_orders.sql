@@ -1,46 +1,34 @@
-with customers as (
-    select *
-    from {{ ref("stg_jaffle_shop__customers") }}
+with orders as (
+    select * from {{ ref('stg_orders') }}
 ),
 
-orders as (
-    select *
-    from {{ ref("stg_jaffle_shop__orders") }}
+customers as (
+    select * from {{ ref('stg_customers') }}
 ),
 
-payments as (
-    select *
-    from {{ ref("stg_stripe__payments") }}
+locations as (
+    select * from {{ ref('stg_locations') }}
 ),
 
-completed_payments as (
+joined as (
     select
-        payments.order_id,
-        max(payments.payment_created_at) as payment_finalized_date,
-        sum(payments.payment_amount) / 100.0 as total_amount_paid
-    from payments
-    where payments.payment_status != 'fail'
-    group by payments.order_id
-),
-
-paid_orders as (
-    select
-        orders.order_id,
+        orders.order_id, 
+        orders.location_id,
         orders.customer_id,
-        orders.order_placed_at,
-        orders.order_status,
+        orders.order_total,
+        orders.tax_paid,
+        orders.ordered_at,
+        customers.customer_name,
+        locations.location_name,
+        locations.tax_rate,
+        locations.location_opened_at
 
-        completed_payments.total_amount_paid,
-        completed_payments.payment_finalized_date,
-
-        customers.customer_first_name,
-        customers.customer_last_name
-    from orders
-    left join completed_payments
-        on orders.order_id = completed_payments.order_id
-    left join
-        customers
-        on orders.customer_id = customers.customer_id
+    from 
+       orders 
+        left join customers 
+            on orders.customer_id = customers.customer_id
+        left join locations 
+            on orders.location_id = locations.location_id    
 )
 
-select * from paid_orders
+select * from joined
