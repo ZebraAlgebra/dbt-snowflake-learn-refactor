@@ -1,9 +1,28 @@
-with p as (
+with
+
+{# import CTEs #}
+
+base_customers as (
+    select *
+    from {{ source("jaffle_shop", "customers") }}
+),
+
+base_orders as (
+    select *
+    from {{ source("jaffle_shop", "orders") }}
+),
+
+base_payments as (
+    select *
+    from {{ source("stripe", "payment") }}
+),
+
+p as (
     select
         orderid as order_id,
         max(created) as payment_finalized_date,
         sum(amount) / 100.0 as total_amount_paid
-    from {{ source("stripe", "payment") }}
+    from base_payments
     where status != 'fail'
     group by orderid
 ),
@@ -18,11 +37,11 @@ paid_orders as (
         p.payment_finalized_date,
         c.first_name as customer_first_name,
         c.last_name as customer_last_name
-    from {{ source("jaffle_shop", "orders") }} as orders
+    from base_orders as orders
     left join p
         on orders.id = p.order_id
     left join
-        {{ source("jaffle_shop", "customers") }} as c
+        base_customers as c
         on orders.user_id = c.id
 ),
 
@@ -32,8 +51,8 @@ customer_orders as (
         min(orders.order_date) as first_order_date,
         max(orders.order_date) as most_recent_order_date,
         count(orders.id) as number_of_orders
-    from {{ source("jaffle_shop", "customers") }} as c
-    left join {{ source("jaffle_shop", "orders") }} as orders
+    from base_customers as c
+    left join base_orders as orders
         on c.id = orders.user_id
     group by c.id
 ),
